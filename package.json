@@ -1,0 +1,12 @@
+{
+  "name": "dbank",
+  "version": "1.0.0",
+  "description": "Decentralised Banking",
+  "author": "nick@deploy.at",
+  "private": true,
+  "license": "MIT",
+  "scripts": {},
+  "workspaces": [
+    "packages/*"
+  ]
+}
