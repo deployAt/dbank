@@ -5,6 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract DaiToken is ERC20 {
     constructor() public ERC20("Dai Token", "DAI") {
-        _mint(msg.sender, 1000000000000000000000000); //1 milion
+        _mint(msg.sender, 1000000000000000000000);
     }
 }
