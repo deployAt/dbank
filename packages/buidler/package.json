@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "buidler node --reset --watch --export contractsInfo.json",
     "deploy": "buidler --network localhost deploy",
+    "scrun": "buidler --network localhost run",
+    "console": "buidler --network localhost console",
     "chain": "buidler node",
     "compile": "buidler compile",
     "test": "buidler test --network buidlerevm",

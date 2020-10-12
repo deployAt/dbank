@@ -14,6 +14,7 @@ describe('Farm', () => {
     let daiToken, deployToken, farm
 
     beforeEach(async () => {
+      // await deployments.fixture()
       daiToken = await DaiToken.deploy()
       deployToken = await DeployToken.deploy()
       farm = await Farm.deploy(deployToken.address, daiToken.address)
