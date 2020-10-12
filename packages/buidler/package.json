@@ -5,17 +5,20 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "chain": "yarn buidler node",
-    "test": "yarn buidler test --network buidlerevm",
-    "compile": "yarn buidler compile",
-    "deploy": "yarn buidler run scripts/deploy.js --network rinkeby && yarn buidler run scripts/publish.js",
-    "wtest": "watch 'yarn test' contracts test"
+    "dev": "buidler node --reset --watch --export contractsInfo.json",
+    "deploy": "buidler --network localhost deploy",
+    "chain": "buidler node",
+    "compile": "buidler compile",
+    "test": "buidler test --network buidlerevm",
+    "dtest": "watch 'yarn test' contracts test"
   },
   "dependencies": {
+    "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.2",
     "@nomiclabs/buidler-waffle": "^2.1.0",
-    "@nomiclabs/buidler": "^1.4.7",
     "@openzeppelin/contracts": "^3.2.0",
+    "buidler-deploy": "^0.6.0-beta.16",
+    "buidler-ethers-v5": "^0.2.2",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
     "ethereum-waffle": "^3.1.1",

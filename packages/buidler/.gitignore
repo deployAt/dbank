@@ -3,4 +3,5 @@ node_modules
 #Buidler files
 cache
 artifacts
-
+deployments/
+contractsInfo.json
