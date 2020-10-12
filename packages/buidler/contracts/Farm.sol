@@ -5,17 +5,19 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Farm {
     string public _name = "The Farm";
+    address public _owner;
     IERC20 public _deployToken;
     IERC20 public _daiToken;
 
-    address[] public stakers;
-    mapping(address => uint256) public stakingBalance;
-    mapping(address => bool) public hasStaked;
-    mapping(address => bool) public isStaking;
+    address[] public _stakers;
+    mapping(address => uint256) public _stakingBalance;
+    mapping(address => bool) public _hasStaked;
+    mapping(address => bool) public _isStaking;
 
     constructor(address deployTokenAddress, address daiTokenAddress) public {
         _deployToken = IERC20(deployTokenAddress);
         _daiToken = IERC20(daiTokenAddress);
+        _owner = msg.sender;
     }
 
     function stakeTokens(uint256 amount, address token) public {
@@ -23,13 +25,33 @@ contract Farm {
 
         IERC20(token).transferFrom(msg.sender, address(this), amount);
 
-        stakingBalance[msg.sender] = stakingBalance[msg.sender] + amount;
+        _stakingBalance[msg.sender] = _stakingBalance[msg.sender] + amount;
 
-        if (!hasStaked[msg.sender]) {
-            stakers.push(msg.sender);
+        if (!_hasStaked[msg.sender]) {
+            _stakers.push(msg.sender);
         }
 
-        isStaking[msg.sender] = true;
-        hasStaked[msg.sender] = true;
+        _isStaking[msg.sender] = true;
+        _hasStaked[msg.sender] = true;
+    }
+
+    function unstakeTokens() public {
+        uint256 balance = _stakingBalance[msg.sender];
+        require(balance > 0, "Staking balance cannot be 0");
+
+        _daiToken.transfer(msg.sender, balance);
+        _stakingBalance[msg.sender] = 0;
+        _isStaking[msg.sender] = false;
+    }
+
+    function issueTokens() public {
+        require(msg.sender == _owner, "Caller must be the owner");
+        for (uint256 i = 0; i < _stakers.length; i++) {
+            address recipient = _stakers[i];
+            uint256 balance = _stakingBalance[recipient];
+            if (balance > 0) {
+                _deployToken.transfer(recipient, balance);
+            }
+        }
     }
 }

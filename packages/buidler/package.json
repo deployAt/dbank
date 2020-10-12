@@ -9,17 +9,18 @@
     "test": "yarn buidler test --network buidlerevm",
     "compile": "yarn buidler compile",
     "deploy": "yarn buidler run scripts/deploy.js --network rinkeby && yarn buidler run scripts/publish.js",
-    "watch": "node scripts/watch.js"
+    "wtest": "watch 'yarn test' contracts test"
   },
-  "devDependencies": {
-    "@nomiclabs/buidler": "^1.4.7",
+  "dependencies": {
     "@nomiclabs/buidler-ethers": "^2.0.2",
     "@nomiclabs/buidler-waffle": "^2.1.0",
+    "@nomiclabs/buidler": "^1.4.7",
     "@openzeppelin/contracts": "^3.2.0",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.0.17",
+    "watch": "^1.0.2",
     "web3": "^1.3.0"
   }
 }
