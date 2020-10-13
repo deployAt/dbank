@@ -1,57 +1,72 @@
-// "SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@nomiclabs/buidler/console.sol";
 
-contract Farm {
+contract Farm is Ownable {
     string public _name = "The Farm";
     address public _owner;
     IERC20 public _deployToken;
-    IERC20 public _daiToken;
 
     address[] public _stakers;
-    mapping(address => uint256) public _stakingBalance;
-    mapping(address => bool) public _hasStaked;
+    mapping(address => mapping(address => uint256)) public _stakingBalance; // token > address
+    mapping(address => uint256) public _uniqueTokensStaked;
+    mapping(address => address) public _tokenPriceFeedMapping;
     mapping(address => bool) public _isStaking;
+    address[] _allowedTokens;
 
-    constructor(address deployTokenAddress, address daiTokenAddress) public {
+    constructor(address deployTokenAddress) public {
         _deployToken = IERC20(deployTokenAddress);
-        _daiToken = IERC20(daiTokenAddress);
-        _owner = msg.sender;
+    }
+
+    function addAllowedTokens(address token) public onlyOwner {
+        _allowedTokens.push(token);
     }
 
     function stakeTokens(uint256 amount, address token) public {
         require(amount > 0, "Amount need to be greater than 0");
 
-        IERC20(token).transferFrom(msg.sender, address(this), amount);
+        if (tokenIsAllowed(token)) {
+            updateUniqueTokensStaked(msg.sender, token);
+            IERC20(token).transferFrom(msg.sender, address(this), amount);
+            _stakingBalance[token][msg.sender] = _stakingBalance[token][msg.sender] + amount;
 
-        _stakingBalance[msg.sender] = _stakingBalance[msg.sender] + amount;
-
-        if (!_hasStaked[msg.sender]) {
-            _stakers.push(msg.sender);
-        }
-
-        _isStaking[msg.sender] = true;
-        _hasStaked[msg.sender] = true;
-    }
-
-    function unstakeTokens() public {
-        uint256 balance = _stakingBalance[msg.sender];
-        require(balance > 0, "Staking balance cannot be 0");
-
-        _daiToken.transfer(msg.sender, balance);
-        _stakingBalance[msg.sender] = 0;
-        _isStaking[msg.sender] = false;
-    }
-
-    function issueTokens() public {
-        require(msg.sender == _owner, "Caller must be the owner");
-        for (uint256 i = 0; i < _stakers.length; i++) {
-            address recipient = _stakers[i];
-            uint256 balance = _stakingBalance[recipient];
-            if (balance > 0) {
-                _deployToken.transfer(recipient, balance);
+            if (_uniqueTokensStaked[msg.sender] >= 1) {
+                _stakers.push(msg.sender);
             }
+        }
+    }
+
+    function unstakeTokens(address token) public {
+        uint256 balance = _stakingBalance[token][msg.sender];
+        require(balance > 0, "Staking balance cannot be 0");
+        _stakingBalance[token][msg.sender] = 0;
+        _uniqueTokensStaked[msg.sender] = _uniqueTokensStaked[msg.sender] - 1;
+        IERC20(token).transfer(msg.sender, balance);
+    }
+
+    function tokenIsAllowed(address token) public view returns (bool) {
+        for (uint256 allowedTokensIndex = 0; allowedTokensIndex < _allowedTokens.length; allowedTokensIndex++) {
+            if (_allowedTokens[allowedTokensIndex] == token) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function updateUniqueTokensStaked(address user, address token) internal {
+        if (_stakingBalance[token][user] <= 0) {
+            _uniqueTokensStaked[user] = _uniqueTokensStaked[user] + 1;
+        }
+    }
+
+    function issueTokens() public onlyOwner {
+        for (uint256 stakersIndex = 0; stakersIndex < _stakers.length; stakersIndex++) {
+            address recipient = _stakers[stakersIndex];
+            uint256 balance = 10000000000000000000; //10
+            _deployToken.transfer(recipient, balance);
         }
     }
 }

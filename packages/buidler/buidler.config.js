@@ -25,7 +25,7 @@ module.exports = {
   },
   namedAccounts: {
     deployer: 0,
-    investor: 1,
+    user: 1,
   },
   paths: {
     sources: 'contracts',
