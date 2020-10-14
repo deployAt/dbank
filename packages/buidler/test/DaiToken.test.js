@@ -1,20 +1,36 @@
-const { expect } = require('chai')
+const expect = require('./chai-setup').expect
+const bre = require('@nomiclabs/buidler')
+// const ethers = require('ethers')
+const ethers = require('@nomiclabs/buidler').ethers
+const getNamedAccounts = require('@nomiclabs/buidler').getNamedAccounts
+
 const parseEther = require('ethers').utils.parseEther
+const deploy = bre.deployments.deploy
+
+console.log(expect)
 
 describe('DaiToken', () => {
   let DaiToken // contract factory
-  let token, wallet, walletTo
+  let token, wallet, walletTo, deployerSigner
 
   before(async () => {
-    // Wallet
-    const accounts = await ethers.getSigners()
-    wallet = await accounts[0].getAddress()
-    walletTo = await accounts[1].getAddress()
-    DaiToken = await ethers.getContractFactory('DaiToken')
+    const { deployer, user } = await getNamedAccounts()
+    wallet = deployer
+    walletTo = user
+    deployerSigner = await ethers.getSigner(deployer)
   })
 
   beforeEach(async () => {
-    token = await DaiToken.deploy()
+    await deploy('DaiToken', {
+      // contract: 'ERC20Log',
+      from: wallet,
+      // args: [INIT_TOKEN_SUPPLY, 'DeployToken', 'DPL'],
+      log: true,
+    })
+
+    token = await ethers.getContract('DaiToken', deployerSigner)
+
+    // token = await DaiToken.deploy()
   })
 
   it('Assigns initial balance', async () => {

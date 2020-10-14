@@ -1,5 +1,4 @@
 require('dotenv').config()
-usePlugin('@nomiclabs/buidler-waffle')
 usePlugin('buidler-ethers-v5')
 usePlugin('buidler-deploy')
 
